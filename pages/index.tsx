@@ -1,11 +1,13 @@
-import { Counter } from "../Counter";
-import { Layout } from "../Layout";
+
+import { Comments } from "../components/Comments.tsx";
+import { Layout } from "../components/Layout.tsx";
+
 
 export default function () {
   return (
-    <Layout title="Home">
-      <Counter />
-      <div style={{ height: "20px" }}></div>
+    <Layout>
+      <Comments />
+      <div style={ { height: "20px" } } ></div>
       <p>
         <a href="/">Home</a>
       </p>

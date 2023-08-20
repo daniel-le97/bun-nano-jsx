@@ -3,18 +3,16 @@
   "version": "0.1.97",
   "dependencies": {
     "bun-types": "canary",
-    "react": "next",
-    "react-dom": "next",
-    "web-vitals": "^3.0.3"
+    "nano-jsx": "^0.0.37",
+    "svelte": "^4.2.0",
+    "typed-html": "^3.0.1"
   },
   "devDependencies": {
-    "@types/react": "^18.0.37",
-    "@types/react-dom": "^18.0.11",
-    "typescript": "latest",
-    "react-refresh": "0.10.0"
+    "@types/react": "^18.2.20",
+    "typescript": "latest"
   },
   "scripts": {
-    "dev": "bun --watch dev.tsx"
+    "dev": "NODE_ENV=production bun --watch dev.tsx"
   },
   "module": "index.ts",
   "type": "module"

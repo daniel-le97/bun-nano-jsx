@@ -1,4 +1,8 @@
-import { hydrateRoot } from "react-dom/client";
-const { default: App } = await import(globalThis.PATH_TO_PAGE);
+import { h } from 'nano-jsx/esm/index.js';
+import { Comments } from './components/Comments.tsx';
+import { hydrate } from 'nano-jsx'
 
-hydrateRoot(document, <App />);
+const comments = [ 'Hey! This is the first comment.', 'Hi, from another comment!' ]
+
+const el = document.getElementById( 'comments' );
+if ( el ) hydrate( <Comments comments={ comments } />, el );

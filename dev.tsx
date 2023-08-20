@@ -1,7 +1,9 @@
 import * as path from 'path';
 import {statSync} from 'fs';
 import type {ServeOptions} from 'bun';
-import {renderToReadableStream, renderToString} from 'react-dom/server';
+// import {renderToReadableStream, renderToString} from 'react-dom/server';
+import {renderSSR , Helmet} from 'nano-jsx/esm/index.js';
+
 
 const PROJECT_ROOT = import.meta.dir;
 const PUBLIC_DIR = path.resolve(PROJECT_ROOT, 'public');
@@ -15,17 +17,17 @@ const srcRouter = new Bun.FileSystemRouter({
 await Bun.build({
   entrypoints: [
     import.meta.dir + '/hydrate.tsx',
-    ...Object.values(srcRouter.routes),
+    // ...Object.values(srcRouter.routes),
   ],
   outdir: BUILD_DIR,
   target: 'browser',
   splitting: true,
 });
 
-const buildRouter = new Bun.FileSystemRouter({
-  dir: BUILD_DIR + '/pages',
-  style: 'nextjs',
-});
+// const buildRouter = new Bun.FileSystemRouter({
+//   dir: BUILD_DIR + '/pages',
+//   style: 'nextjs',
+// });
 
 function serveFromDir(config: {
   directory: string;
@@ -51,18 +53,31 @@ export default {
   async fetch(request) {
     const match = srcRouter.match(request);
     if (match) {
-      const builtMatch = buildRouter.match(request);
-      if (!builtMatch) {
-        return new Response('Unknown error', {status: 500});
-      }
+      // const builtMatch = buildRouter.match(request);
+      // if (!builtMatch) {
+      //   return new Response('Unknown error', {status: 500});
+      // }
 
       const Component = await import(match.filePath);
-      const stream = await renderToReadableStream(<Component.default />, {
-        bootstrapScriptContent: `globalThis.PATH_TO_PAGE = "/${builtMatch.src}";`,
-        bootstrapModules: ['/hydrate.js'],
-      });
+      const ssr = Helmet.SSR( renderSSR( () => <Component.default /> ) );
+      const html = `
+  <!DOCTYPE html>
+  <html ${ ssr.attributes.html.toString() }>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script defer src="/hydrate.js"></script>
+      ${ ssr.head.join( '\n' ) }
+    </head>
+    <body ${ ssr.attributes.body.toString() }>
+      ${ ssr.body }
+      ${ ssr.footer }
+    </body>
+  </html>
+  `;
 
-      return new Response(stream, {
+
+      return new Response( html, {
         headers: {'Content-Type': 'text/html; charset=utf-8'},
       });
     }
